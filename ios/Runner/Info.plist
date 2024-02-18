@@ -28,6 +28,12 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<key>NSCameraUsageDescription</key>
+    <string>Buka privasi ini untuk akses kamera.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Buka privasi ini untuk akses mikrofon.</string>
+    <key>NSPhotoLibraryUsageDescription </key>
+    <string>Buka privasi ini untuk akses galeri foto.</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
