@@ -1,11 +1,11 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:take_image/provider/upload_provider.dart';
 import 'package:take_image/screen/camera_screen.dart';
 
 import '../provider/home_provider.dart';
@@ -26,7 +26,11 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             onPressed: () => _onUpload(),
-            icon: const Icon(Icons.upload),
+            icon: context.watch<UploadProvider>().isUploading
+                ? const CircularProgressIndicator(
+                    color: Colors.white,
+                  )
+                : const Icon(Icons.upload),
             tooltip: "Unggah",
           ),
         ],
@@ -73,7 +77,36 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  _onUpload() async {}
+  _onUpload() async {
+    final ScaffoldMessengerState scaffoldMessengerState =
+        ScaffoldMessenger.of(context);
+    final uploadProvider = context.read<UploadProvider>();
+
+    final homeProvider = context.read<HomeProvider>();
+    final imagePath = homeProvider.imagePath;
+    final imageFile = homeProvider.imageFile;
+    if (imagePath == null || imageFile == null) return;
+
+    final fileName = imageFile.name;
+    final bytes = await imageFile.readAsBytes();
+
+    final newBytes = await uploadProvider.compressImage(bytes);
+
+    await uploadProvider.upload(
+      newBytes,
+      fileName,
+      "Ini adalah deskripsi gambar",
+    );
+
+    if (uploadProvider.uploadResponse != null) {
+      homeProvider.setImageFile(null);
+      homeProvider.setImagePath(null);
+    }
+
+    scaffoldMessengerState.showSnackBar(
+      SnackBar(content: Text(uploadProvider.message)),
+    );
+  }
 
   _onGalleryView() async {
     final isMacOs = defaultTargetPlatform == TargetPlatform.macOS;
