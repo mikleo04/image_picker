@@ -1,10 +1,12 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:take_image/screen/camera_screen.dart';
 
 import '../provider/home_provider.dart';
 
@@ -120,5 +122,20 @@ class _HomePageState extends State<HomePage> {
           );
   }
 
-  _onCustomCameraView() async {}
+  _onCustomCameraView() async {
+    final navigator = Navigator.of(context);
+    final provider = context.read<HomeProvider>();
+    final cameras = await availableCameras();
+
+    final XFile? resultImageFile = await navigator.push(MaterialPageRoute(
+      builder: (context) => CameraScreen(
+        cameras: cameras,
+      ),
+    ));
+
+    if (resultImageFile != null) {
+      provider.setImageFile(resultImageFile);
+      provider.setImagePath(resultImageFile.path);
+    }
+  }
 }
